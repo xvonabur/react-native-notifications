@@ -246,6 +246,13 @@ RCT_EXPORT_MODULE()
     }
 }
 
++ (void)didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type
+{
+    NSMutableDictionary *dictionary = [payload.dictionaryPayload mutableCopy];
+    dictionary[@"_pushType"] = type;
+    [RNNotifications didReceiveRemoteNotification:dictionary];
+}
+
 + (void)handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler
 {
     [self emitNotificationActionForIdentifier:identifier responseInfo:responseInfo userInfo:notification.userInfo completionHandler:completionHandler];
@@ -578,6 +585,19 @@ RCT_EXPORT_METHOD(cancelLocalNotification:(NSString *)notificationId)
 RCT_EXPORT_METHOD(cancelAllLocalNotifications)
 {
     [RCTSharedApplication() cancelAllLocalNotifications];
+}
+
+RCT_EXPORT_METHOD(isRegisteredForRemoteNotifications:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+{
+    BOOL ans;
+    
+    if (TARGET_IPHONE_SIMULATOR) {
+        ans = [[[UIApplication sharedApplication] currentUserNotificationSettings] types] != 0;
+    }
+    else {
+        ans = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
+    }
+    resolve(@(ans));
 }
 
 @end

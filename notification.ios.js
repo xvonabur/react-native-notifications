@@ -67,6 +67,10 @@ export default class IOSNotification {
     return this._type;
   }
 
+  getPushType(): ?string {
+    return this._data._pushType;
+  }
+
   finish(finishResult) {
     if (!this._finishCalled && this._data._completionHandlerId) {
       this._finishCalled = true;
