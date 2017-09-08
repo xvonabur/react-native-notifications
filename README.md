@@ -82,17 +82,8 @@ include ':react-native-notifications'
 project(':react-native-notifications').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-notifications/android')
 ```
 
-2. Declare the library as a dependency in your **app-project's** `build.gradle`:
+2. Declare the library *and* Firebase Messaging as dependencies in your **app-project's** `build.gradle`:
 
-```gradle
-dependencies {
-	// ...
-
-	compile project(':react-native-notifications')
-}
-```
-
-Alternatively, if you're already using a specific Firebase version, you can exclude our `firebase-messaging` dependency and replace it with your own version (e.g. 10.2.1) as follows:
 
 ```gradle
 dependencies {
@@ -103,8 +94,11 @@ dependencies {
     }
 
     com.google.firebase:firebase-messaging:10.2.1
+	compile project(':react-native-notifications')
 }
 ```
+
+**IMPORTANT:** Excluding `firebase-messaging` from `react-native-notifications`, then adding it as a direct dependency if your app is extremely important. It is a work-around for a bug in the Google Services (`com.google.gms.google-services`) plugin (see _Receiving push notifications_ below).
 
 3. Add the library to your `MainApplication.java`:
 
