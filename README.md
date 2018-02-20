@@ -81,29 +81,22 @@ include ':react-native-notifications'
 project(':react-native-notifications').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-notifications/android')
 ```
 
-2. Declare the library as a dependency in your **app-project's** `build.gradle`:
+2. Declare the library *and* Firebase Messaging as dependencies in your **app-project's** `build.gradle`:
 
-```gradle
-dependencies {
-	// ...
-
-	compile project(':react-native-notifications')
-}
-```
-
-Alternatively, if you're already using a specific Firebase version, you can exclude our `firebase-messaging` dependency and replace it with your own version (e.g. 10.2.1) as follows:
 
 ```gradle
 dependencies {
     // ...
 
+    compile 'com.google.firebase:firebase-messaging:10.2.6'
+
     compile(project(':react-native-notifications')) {
         exclude group: 'com.google.firebase', module: 'firebase-messaging'
     }
-
-    com.google.firebase:firebase-messaging:10.2.1
 }
 ```
+
+**IMPORTANT:** Excluding `firebase-messaging` from `react-native-notifications`, then adding it as a direct dependency if your app is extremely important. It is a work-around for a bug in the Google Services (`com.google.gms.google-services`) plugin (see _Receiving push notifications_ below).
 
 3. Add the library to your `MainApplication.java`:
 
@@ -131,7 +124,20 @@ Push notifications on Android are managed and dispatched using Google's [Firebas
 
 2. [Integrate Firebase](https://firebase.google.com/docs/android/setup) in your native Android project.
 
-If you've followed the instructions correctly your Android project will now include a file called `google-services.json` and the bottom of your `build.gradle` will look something like:
+If you've followed the instructions correctly your Android project will now include a file called `google-services.json`, your root `build.gradle` (`android/build.gradle`) will have an additional classpath dependency:
+
+```gradle
+buildscript {
+    // ...
+    dependencies {
+	// ...
+        classpath 'com.google.gms:google-services:3.0.0'
+        // ...
+    }
+}
+```
+
+and the bottom of your app's `build.gradle` (`android/app/build.gradle`) will look something like:
 
 ```gradle
 
@@ -139,8 +145,6 @@ If you've followed the instructions correctly your Android project will now incl
 
 apply plugin: 'com.google.gms.google-services'
 ```
-
-**IMPORTANT**: Do NOT add `com.google.firebase:firebase-messaging` as an explicit dependency unless you wish to try override our version (see "Installation").
 
 ---
 
@@ -199,10 +203,6 @@ import {NotificationsAndroid} from 'react-native-notifications';
 NotificationsAndroid.setRegistrationTokenUpdateListener((deviceToken) => {
 	console.log('Push-notifications registered!', deviceToken)
 });
-
-// In case the token registration took place prior to setting our listener.
-NotificationsAndroid.refreshToken();
-
 ```
 
 `deviceToken` being the token used to identify the device on the GCM.
@@ -312,7 +312,6 @@ Instead the notifications go to the "system tray" application, and it automatica
 These automatic background notifications have several limited functionality:
 
 - They do not support the full range of options that are available to app generated "local notifications". e.g. `largeIcon` is not supported.
-  
   Please refer to the official [Firebase server reference](https://firebase.google.com/docs/cloud-messaging/http-server-ref#table2) to see what is supported.
 
 - When a user taps on an system tray generated notification the Android OS will actually re-launch your app's primary/launcher activity. If you're using stock React Native this effectively restarts your app.
@@ -330,7 +329,7 @@ We provide a similar implementation on Android using `NotificationsAndroid.getIn
 ```javascript
 import {NotificationsAndroid} from 'react-native-notifications';
 
-PendingNotifications.getInitialNotification()
+NotificationsAndroid.getInitialNotification()
   .then((notification) => {
   		console.log("Initial notification was:", notification || "N/A");
 	})
@@ -665,14 +664,18 @@ The [example app](https://github.com/wix/react-native-notifications/tree/master/
 
 # Table of Content
 
-- [Installation and setup](./docs/installation.md) - Setting up the library in your app
-- [Subscription](./docs/subscription.md) - Signing in to push notifications vendors (e.g. GCM)
-- [Notification Events (notfications core)](./docs/notificationsEvents.md) - Handling push notification arrival, notification opening by users
-- [Local notifications](./docs/localNotifications.md) - Manually triggering notifications (i.e. not via push)
-- [Advanced iOS topics](./docs/advancedIos.md) - e.g. managed notifications, PushKit API, Notifications actions
-- [Notifications layout control - Android (wiki page)](https://github.com/wix/react-native-notifications/wiki/Android:-Layout-Customization) - Learn how to fully customize your notifications layout on Android!
 
-# License
+#### Set application icon badges count (iOS only)
+
+Set to specific number:
+```javascript
+NotificationsIOS.setBadgesCount(2);
+```
+Clear badges icon:
+```javascript
+NotificationsIOS.setBadgesCount(0);
+```
+## License
 The MIT License.
 
 See [LICENSE](LICENSE)
