@@ -83,6 +83,8 @@ export default class IOSNotification {
       }
       RNNotifications.finishRemoteNotification(this._data._completionHandlerId, result);
     }
+  }
+
   getThread(): ?string {
     return this._thread;
   }
