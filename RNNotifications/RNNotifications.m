@@ -272,6 +272,8 @@ RCT_EXPORT_MODULE()
         if (state == UIApplicationStateActive) {
             // Notification received foreground
             [self didReceiveNotificationOnForegroundState:data];
+            // Add opening callback for foreground case
+            [self didNotificationOpen:data];
         } else if (state == UIApplicationStateInactive) {
             // Notification opened
             [self didNotificationOpen:data];
