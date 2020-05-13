@@ -149,6 +149,7 @@ public class PushNotification implements IPushNotification {
                 .setContentIntent(intent)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setPriority(Notification.PRIORITY_HIGH)
+                .setStyle(new Notification.BigTextStyle().bigText(mNotificationProps.getBody()))
                 .setAutoCancel(true);
 
         setUpIcon(notification);
